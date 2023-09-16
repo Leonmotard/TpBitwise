@@ -10,6 +10,8 @@ namespace TPBitwiseTraining.Utils
         {
             CreateMap<BrandCreationDTO, Brand>().ReverseMap();
             CreateMap<BrandAnswerDTO, Brand>().ReverseMap();
+            CreateMap<CategoryCreationDTO, Category>().ReverseMap();
+            CreateMap<CategoryAnswerDTO, Category>().ReverseMap();
 
         }
 
