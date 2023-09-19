@@ -31,22 +31,20 @@ namespace TPBitwiseTraining.Controllers
             return Ok(categoriesDto);
         }
 
+
         [HttpPost]
         public async Task<ActionResult<CategoryCreationDTO>> Create(CategoryCreationDTO categoryCreationDTO)
         {
             var category = _mapper.Map<Category>(categoryCreationDTO);
             await _repository.Insert(category);
             var brandDTO = _mapper.Map<CategoryAnswerDTO>(category);
-            _responseApi.StatusCode = HttpStatusCode.OK;
-            _responseApi.IsSuccess = true;
-            return Ok(_responseApi);
+            return CreatedAtAction(nameof(GetAll), new { id = category.Id }, brandDTO);
 
         }
 
 
 
         [HttpDelete("{id}")]
-
         public async Task<ActionResult> Delete(int id)
         {
             var categoryDb = await _repository.GetById(id);
