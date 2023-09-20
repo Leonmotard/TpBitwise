@@ -18,6 +18,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(opt =>
 
 //Builder for Repository Interfaces and implementations
 builder.Services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddAutoMapper(typeof(AutomapperProfile));
 
 var app = builder.Build();

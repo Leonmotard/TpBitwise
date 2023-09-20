@@ -20,7 +20,7 @@ namespace TPBitwiseTraining.Utils
                 .ForMember(d=> d.Brand, o => o.Ignore());
 
             CreateMap<Product, ProductListDTO>().
-                ForMember(d => d.BrandName, o => o.MapFrom(src => src.Brand.Name));
+                ForMember(d => d.BrandName, o => o.MapFrom(src=> src.Brand.Name));
 
             CreateMap<Product, ProductAnswerDTO>()
                 .ForMember(d => d.BrandName, o => o.MapFrom(src => src.Brand.Name))

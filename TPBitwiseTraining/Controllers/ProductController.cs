@@ -13,20 +13,23 @@ namespace TPBitwiseTraining.Controllers
     public class ProductController : ControllerBase
     {
         private readonly IGenericRepository<Product> _repository;
+        private readonly IProductRepository _productRepository;
         private readonly IMapper _mapper;
         protected ResponseApi _responseApi;
 
-        public ProductController(IGenericRepository<Product> repository, IMapper mapper)
+        public ProductController(IGenericRepository<Product> repository, IProductRepository productRepository, IMapper mapper)
         {
             _repository = repository;
+            _productRepository = productRepository;
             _mapper = mapper;
             this._responseApi = new();
+             
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CategoryAnswerDTO>>> GetAll()
         {
-            var products = await _repository.GetAll();
+            var products = await _productRepository.GetAllAsyncWithData();
             var productsDto = _mapper.Map<IEnumerable<ProductListDTO>>(products);
             return Ok(productsDto);
         }
@@ -34,7 +37,7 @@ namespace TPBitwiseTraining.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductAnswerDTO>> Obtener(int id)
         {
-            var product = await _repository.GetById(id);
+            var product = await _productRepository.GetByIdWithData(id);
 
             if (product == null)
             {
