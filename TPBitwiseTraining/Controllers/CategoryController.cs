@@ -37,8 +37,8 @@ namespace TPBitwiseTraining.Controllers
         {
             var category = _mapper.Map<Category>(categoryCreationDTO);
             await _repository.Insert(category);
-            var brandDTO = _mapper.Map<CategoryAnswerDTO>(category);
-            return CreatedAtAction(nameof(GetAll), new { id = category.Id }, brandDTO);
+            var categoryDTO = _mapper.Map<CategoryAnswerDTO>(category);
+            return CreatedAtAction(nameof(GetAll), new { id = category.Id }, categoryDTO);
 
         }
 

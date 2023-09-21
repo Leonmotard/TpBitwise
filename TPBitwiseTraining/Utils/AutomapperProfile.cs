@@ -25,6 +25,15 @@ namespace TPBitwiseTraining.Utils
             CreateMap<Product, ProductAnswerDTO>()
                 .ForMember(d => d.BrandName, o => o.MapFrom(src => src.Brand.Name))
                 .ForMember(d => d.CategoryName, o => o.MapFrom(src => src.Category.Name));
+
+            CreateMap<AppUser, UserPropertiesDTO>().ReverseMap();
+
+            CreateMap<AppUser, UserDTO>().ReverseMap();
+
+            CreateMap<AppUser, UserLoginDTO>().ReverseMap();
+
+            CreateMap<AppUser, UserAnswerDTO>().ReverseMap();
+
                 
         }
 

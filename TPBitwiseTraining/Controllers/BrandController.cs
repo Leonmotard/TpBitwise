@@ -37,10 +37,8 @@ namespace TPBitwiseTraining.Controllers
             var brand = _mapper.Map<Brand>(brandCreationDTO);
             await _repository.Insert(brand);
             var brandDTO = _mapper.Map<BrandAnswerDTO>(brand);
-            _responseApi.StatusCode = HttpStatusCode.OK;
-            _responseApi.IsSuccess = true;
-            return Ok(_responseApi);
-           
+            return CreatedAtAction(nameof(GetAll), new { id = brand.Id }, brandDTO);
+
         }
 
 
