@@ -18,8 +18,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers(
     opcion =>
     {
-        opcion.CacheProfiles.Add("Por defecto", new CacheProfile() { Duration = 90 });
-        opcion.CacheProfiles.Add("Mas rapido", new CacheProfile() { Duration = 30 });
+        opcion.CacheProfiles.Add("Default", new CacheProfile() { Duration = 90 });
+        opcion.CacheProfiles.Add("Shorter", new CacheProfile() { Duration = 30 });
     }
     );
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -91,6 +91,8 @@ builder.Services.AddAuthentication(x =>
 builder.Services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IBrandRepository, BrandRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddAutoMapper(typeof(AutomapperProfile));
 
 

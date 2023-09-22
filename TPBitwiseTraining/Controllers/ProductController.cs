@@ -10,6 +10,7 @@ namespace TPBitwiseTraining.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [ResponseCache(CacheProfileName = "Default")]
     public class ProductController : ControllerBase
     {
         private readonly IGenericRepository<Product> _repository;

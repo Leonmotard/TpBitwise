@@ -10,17 +10,20 @@ namespace TPBitwiseTraining.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [ResponseCache(CacheProfileName = "Default")]
     public class CategoryController : ControllerBase
     {
         private readonly IGenericRepository<Category> _repository;
+        private readonly ICategoryRepository _categoryRepository;
         private readonly IMapper _mapper;
         protected ResponseApi _responseApi;
 
-        public CategoryController(IGenericRepository<Category> repository, IMapper mapper)
+        public CategoryController(IGenericRepository<Category> repository, IMapper mapper, ICategoryRepository categoryRepository)
         {
             _repository = repository;
             _mapper = mapper;
             this._responseApi = new();
+            _categoryRepository = categoryRepository;   
         }
 
         [HttpGet]
@@ -29,6 +32,22 @@ namespace TPBitwiseTraining.Controllers
             var categories = await _repository.GetAll();
             var categoriesDto = _mapper.Map<IEnumerable<CategoryAnswerDTO>>(categories);
             return Ok(categoriesDto);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<CategoryAnswerDTO>> GetByIdWithProducts(int id)
+        {
+            var categoryDb = await _categoryRepository.GetByIdWithProducts(id);
+            if (categoryDb == null)
+            {
+                _responseApi.StatusCode = HttpStatusCode.NotFound;
+                _responseApi.IsSuccess = false;
+                _responseApi.ErrorMenssages.Add("The brand is not registrered in data base");
+                return NotFound(_responseApi);
+            }
+
+            var categoryDTO = _mapper.Map<CategoryAnswerDTO>(categoryDb);
+            return Ok(categoryDTO);
         }
 
 

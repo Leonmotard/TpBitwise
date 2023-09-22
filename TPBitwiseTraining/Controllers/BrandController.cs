@@ -10,25 +10,54 @@ namespace TPBitwiseTraining.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [ResponseCache(CacheProfileName = "Default")]
     public class BrandController : ControllerBase
     {
         private readonly IGenericRepository<Brand> _repository;
+        private readonly IBrandRepository _brandRepository;
         private readonly IMapper _mapper;
         protected ResponseApi _responseApi;
 
-        public BrandController(IGenericRepository<Brand> repository, IMapper mapper)
+        public BrandController(IGenericRepository<Brand> repository, IBrandRepository brandRepository, IMapper mapper)
         {
             _repository = repository;
+            _brandRepository = brandRepository;
             _mapper = mapper;
             this._responseApi = new();
         }
 
+        [ResponseCache(CacheProfileName = "Shorter")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BrandAnswerDTO>>> GetAll()
         {
             var brands = await _repository.GetAll();
             var brandsDto = _mapper.Map<IEnumerable<BrandAnswerDTO>>(brands);
             return Ok(brandsDto);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<BrandAnswerDTO>> GetById(int id)
+        {
+            var brandDb = await _repository.GetById(id);
+            if(brandDb == null)
+            {
+                _responseApi.StatusCode = HttpStatusCode.NotFound;
+                _responseApi.IsSuccess = false;
+                _responseApi.ErrorMenssages.Add("The brand is not registrered in data base");
+                return NotFound(_responseApi);
+            }
+
+            var brandDto = _mapper.Map<BrandAnswerDTO>(brandDb);
+            return Ok(brandDto);
+        }
+
+        [HttpGet("withProducts")]
+        public async Task<ActionResult<IEnumerable<BrandAnswerDTO>>> GetBrandWihtProducts()
+        {
+            var brands = await _brandRepository.GetBrandWihtProducts();
+            var brandsDTO = _mapper.Map<IEnumerable<BrandAnswerDTO>>(brands);
+            return Ok(brandsDTO);
+
         }
 
         [HttpPost]

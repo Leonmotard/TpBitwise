@@ -9,10 +9,10 @@ namespace TPBitwiseTraining.Utils
         public AutomapperProfile()
         {
             CreateMap<BrandCreationDTO, Brand>().ReverseMap();
-            CreateMap<BrandAnswerDTO, Brand>().ReverseMap();
+            CreateMap<Brand, BrandAnswerDTO>().ReverseMap();
             
             CreateMap<CategoryCreationDTO, Category>().ReverseMap();
-            CreateMap<CategoryAnswerDTO, Category>().ReverseMap();
+            CreateMap<Category, CategoryAnswerDTO > ().ReverseMap();
 
             CreateMap<ProductCreationDTO, Product>()
                 .ForMember(d => d.Id, o=> o.Ignore())
@@ -25,6 +25,8 @@ namespace TPBitwiseTraining.Utils
             CreateMap<Product, ProductAnswerDTO>()
                 .ForMember(d => d.BrandName, o => o.MapFrom(src => src.Brand.Name))
                 .ForMember(d => d.CategoryName, o => o.MapFrom(src => src.Category.Name));
+
+            CreateMap<Product, ProductBrandDTO>().ReverseMap();
 
             CreateMap<AppUser, UserPropertiesDTO>().ReverseMap();
 
