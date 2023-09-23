@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
+using System.Data;
 using System.Net;
 using TPBitwiseTraining.DAL.Interfaces;
 using TPBitwiseTraining.DTO;
@@ -10,7 +13,6 @@ namespace TPBitwiseTraining.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [ResponseCache(CacheProfileName = "Default")]
     public class CategoryController : ControllerBase
     {
         private readonly IGenericRepository<Category> _repository;
@@ -26,6 +28,8 @@ namespace TPBitwiseTraining.Controllers
             _categoryRepository = categoryRepository;   
         }
 
+        [Authorize(Roles = "user, admin")]
+        [OutputCache(Duration = 60, PolicyName = "OutputCacheWithAuthPolicy")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CategoryAnswerDTO>>> GetAll()
         {
@@ -34,6 +38,8 @@ namespace TPBitwiseTraining.Controllers
             return Ok(categoriesDto);
         }
 
+        [Authorize(Roles = "user, admin")]
+        [OutputCache(Duration = 60, PolicyName = "OutputCacheWithAuthPolicy")]
         [HttpGet("{id}")]
         public async Task<ActionResult<CategoryAnswerDTO>> GetByIdWithProducts(int id)
         {
@@ -50,7 +56,7 @@ namespace TPBitwiseTraining.Controllers
             return Ok(categoryDTO);
         }
 
-
+        [Authorize(Roles = "admin")]
         [HttpPost]
         public async Task<ActionResult<CategoryCreationDTO>> Create(CategoryCreationDTO categoryCreationDTO)
         {
@@ -62,7 +68,7 @@ namespace TPBitwiseTraining.Controllers
         }
 
 
-
+        [Authorize(Roles = "admin")]
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
@@ -88,7 +94,7 @@ namespace TPBitwiseTraining.Controllers
 
         }
 
-
+        [Authorize(Roles = "admin")]
         [HttpPut("{id}")]
         public async Task<ActionResult> Update(int id, CategoryCreationDTO categoryCreationDTO)
         {

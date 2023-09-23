@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 using System.Net;
 using TPBitwiseTraining.DAL.Interfaces;
 using TPBitwiseTraining.DTO;
@@ -10,6 +12,7 @@ namespace TPBitwiseTraining.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "admin")]
     public class UserController : ControllerBase
     {
 
@@ -51,7 +54,7 @@ namespace TPBitwiseTraining.Controllers
         }
 
             
-            [HttpPost("register")]
+            [HttpPost("adminRegister")]
             public async Task<IActionResult> Register([FromBody] UserRegisterDTO userRegisterDTO)
             {
                 var validacionNombre = await _userRepository.IsUniqueUser(userRegisterDTO.UserName);
@@ -63,7 +66,7 @@ namespace TPBitwiseTraining.Controllers
                     return BadRequest(_response);
                 }
 
-                var usuario = await _userRepository.Register(userRegisterDTO);
+                var usuario = await _userRepository.RegisterAdmin(userRegisterDTO);
                 if (usuario == null)
                 {
                     _response.StatusCode = HttpStatusCode.BadRequest;
@@ -78,7 +81,36 @@ namespace TPBitwiseTraining.Controllers
 
             }
 
-            [HttpPost("login")]
+        [AllowAnonymous]
+        [HttpPost("userRegister")]
+        public async Task<IActionResult> RegisterUser([FromBody] UserRegisterDTO userRegisterDTO)
+        {
+            var validacionNombre = await _userRepository.IsUniqueUser(userRegisterDTO.UserName);
+            if (!validacionNombre)
+            {
+                _response.StatusCode = HttpStatusCode.BadRequest;
+                _response.IsSuccess = false;
+                _response.ErrorMenssages.Add("The user name already exists");
+                return BadRequest(_response);
+            }
+
+            var usuario = await _userRepository.RegisterUser(userRegisterDTO);
+            if (usuario == null)
+            {
+                _response.StatusCode = HttpStatusCode.BadRequest;
+                _response.IsSuccess = false;
+                _response.ErrorMenssages.Add("The user name already exists");
+                return BadRequest(_response);
+            }
+
+            _response.StatusCode = HttpStatusCode.OK;
+            _response.IsSuccess = true;
+            return Ok(_response);
+
+        }
+
+        [AllowAnonymous]
+        [HttpPost("login")]
             public async Task<IActionResult> login([FromBody] UserLoginDTO userLoginDTO)
             {
                 var responseLogin = await _userRepository.Login(userLoginDTO);

@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
+using System.Data;
 using System.Net;
 using TPBitwiseTraining.DAL.Interfaces;
 using TPBitwiseTraining.DTO;
@@ -10,7 +13,7 @@ namespace TPBitwiseTraining.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [ResponseCache(CacheProfileName = "Default")]
+   // [ResponseCache(CacheProfileName = "Default")]
     public class ProductController : ControllerBase
     {
         private readonly IGenericRepository<Product> _repository;
@@ -27,6 +30,8 @@ namespace TPBitwiseTraining.Controllers
              
         }
 
+        [Authorize(Roles = "user, admin")]
+        [OutputCache(Duration = 60, PolicyName = "OutputCacheWithAuthPolicy")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CategoryAnswerDTO>>> GetAll()
         {
@@ -35,6 +40,8 @@ namespace TPBitwiseTraining.Controllers
             return Ok(productsDto);
         }
 
+        [Authorize(Roles = "user, admin")]
+        [OutputCache(Duration = 60, PolicyName = "OutputCacheWithAuthPolicy")]
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductAnswerDTO>> Obtener(int id)
         {
@@ -54,7 +61,7 @@ namespace TPBitwiseTraining.Controllers
             return Ok(productDTO);
         }
 
-
+        [Authorize(Roles = "admin")]
         [HttpPost]
         public async Task<ActionResult<ProductCreationDTO>> Crear(ProductCreationDTO productCreationDTO)
         {
@@ -65,6 +72,7 @@ namespace TPBitwiseTraining.Controllers
             return CreatedAtAction(nameof(GetAll), new { id = product.Id }, productDTO);
         }
 
+        [Authorize(Roles = "admin")]
         [HttpPut("{id}")]
         public async Task<ActionResult> Update(int id, ProductCreationDTO productCreationDTO)
         {
@@ -90,9 +98,8 @@ namespace TPBitwiseTraining.Controllers
             return BadRequest(_responseApi);
         }
 
-
+        [Authorize(Roles = "admin")]
         [HttpDelete("{id}")]
-
         public async Task<ActionResult> Delete(int id)
         {
             var productDb = await _repository.GetById(id);

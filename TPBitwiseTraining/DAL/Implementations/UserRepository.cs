@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -82,11 +84,9 @@ namespace TPBitwiseTraining.DAL.Implementations
 
         }
 
-        public async Task<UserPropertiesDTO> Register(UserRegisterDTO userRegisterDTO)
+        [Authorize(Roles = "admin")]
+        public async Task<UserPropertiesDTO> RegisterAdmin(UserRegisterDTO userRegisterDTO)
         {
-
-
-
             var userNew = new AppUser()
             {
                 UserName = userRegisterDTO.UserName,
@@ -106,6 +106,35 @@ namespace TPBitwiseTraining.DAL.Implementations
                 }
 
                 await _userManager.AddToRoleAsync(userNew, "admin");
+                var userReturn = await _context.AppUsers.FirstOrDefaultAsync(u => u.UserName == userRegisterDTO.UserName);
+
+                return _mapper.Map<UserPropertiesDTO>(userReturn);
+            }
+
+            return null;
+        }
+
+        public async Task<UserPropertiesDTO> RegisterUser(UserRegisterDTO userRegisterDTO)
+        {
+            var userNew = new AppUser()
+            {
+                UserName = userRegisterDTO.UserName,
+                Name = userRegisterDTO.Name,
+                Email = userRegisterDTO.UserName,
+                NormalizedEmail = userRegisterDTO.UserName.ToUpper()
+            };
+
+            var result = await _userManager.CreateAsync(userNew, userRegisterDTO.Password);
+
+            if (result.Succeeded)
+            {
+                if (!_roleManager.RoleExistsAsync("admin").GetAwaiter().GetResult())
+                {
+                    await _roleManager.CreateAsync(new IdentityRole("admin"));
+                    await _roleManager.CreateAsync(new IdentityRole("user"));
+                }
+
+                await _userManager.AddToRoleAsync(userNew, "user");
                 var userReturn = await _context.AppUsers.FirstOrDefaultAsync(u => u.UserName == userRegisterDTO.UserName);
 
                 return _mapper.Map<UserPropertiesDTO>(userReturn);

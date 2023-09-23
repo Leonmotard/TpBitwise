@@ -16,12 +16,19 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers(
-    opcion =>
+    /*opcion =>
     {
         opcion.CacheProfiles.Add("Default", new CacheProfile() { Duration = 90 });
         opcion.CacheProfiles.Add("Shorter", new CacheProfile() { Duration = 30 });
-    }
+    }*/
     );
+
+//Add Output Cache with cache in endpoints with authorization header
+builder.Services.AddOutputCache(options =>
+{
+    options.AddBasePolicy(builder => builder.Cache());
+    options.AddPolicy("OutputCacheWithAuthPolicy", CacheWithAuth.Instance);
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(
@@ -61,7 +68,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(opt =>
     opt.UseSqlServer(builder.Configuration.GetConnectionString("CadenaSQL")));
 
 //builder for response cache
-builder.Services.AddResponseCaching();
+//builder.Services.AddResponseCaching();
 
 //Builder for .net Identity
 builder.Services.AddIdentity<AppUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
@@ -112,7 +119,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseResponseCaching();
+//app.UseResponseCaching();
+
+app.UseOutputCache();
 
 app.UseHttpsRedirection();
 

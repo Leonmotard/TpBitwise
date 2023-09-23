@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
+using System.Data;
 using System.Net;
 using TPBitwiseTraining.DAL.Interfaces;
 using TPBitwiseTraining.DTO;
@@ -10,7 +13,7 @@ namespace TPBitwiseTraining.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [ResponseCache(CacheProfileName = "Default")]
+   // [ResponseCache(CacheProfileName = "Default")]
     public class BrandController : ControllerBase
     {
         private readonly IGenericRepository<Brand> _repository;
@@ -26,7 +29,8 @@ namespace TPBitwiseTraining.Controllers
             this._responseApi = new();
         }
 
-        [ResponseCache(CacheProfileName = "Shorter")]
+        [Authorize(Roles = "user, admin")]
+        [OutputCache(Duration = 60, PolicyName = "OutputCacheWithAuthPolicy")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BrandAnswerDTO>>> GetAll()
         {
@@ -35,6 +39,8 @@ namespace TPBitwiseTraining.Controllers
             return Ok(brandsDto);
         }
 
+        [Authorize(Roles = "user, admin")]
+        [OutputCache(Duration = 60, PolicyName = "OutputCacheWithAuthPolicy")]
         [HttpGet("{id}")]
         public async Task<ActionResult<BrandAnswerDTO>> GetById(int id)
         {
@@ -51,6 +57,8 @@ namespace TPBitwiseTraining.Controllers
             return Ok(brandDto);
         }
 
+        [Authorize(Roles = "user, admin")]
+        [OutputCache(Duration = 60, PolicyName = "OutputCacheWithAuthPolicy")]
         [HttpGet("withProducts")]
         public async Task<ActionResult<IEnumerable<BrandAnswerDTO>>> GetBrandWihtProducts()
         {
@@ -60,6 +68,7 @@ namespace TPBitwiseTraining.Controllers
 
         }
 
+        [Authorize(Roles = "admin")]
         [HttpPost]
         public async Task<ActionResult<BrandCreationDTO>> Create(BrandCreationDTO brandCreationDTO)
         {
@@ -71,9 +80,8 @@ namespace TPBitwiseTraining.Controllers
         }
 
 
-
+        [Authorize(Roles = "admin")]
         [HttpDelete("{id}")]
-
         public async Task<ActionResult> Delete(int id)
         {
             var brandDb = await _repository.GetById(id);
@@ -98,7 +106,7 @@ namespace TPBitwiseTraining.Controllers
 
         }
 
-
+        [Authorize(Roles = "admin")]
         [HttpPut("{id}")]
         public async Task<ActionResult> Update(int id, BrandCreationDTO brandCreationDTO)
         {
