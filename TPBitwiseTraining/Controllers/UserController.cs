@@ -53,7 +53,7 @@ namespace TPBitwiseTraining.Controllers
             return Ok(user);
         }
 
-            
+            [AllowAnonymous]
             [HttpPost("adminRegister")]
             public async Task<IActionResult> Register([FromBody] UserRegisterDTO userRegisterDTO)
             {
